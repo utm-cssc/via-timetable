@@ -10,7 +10,7 @@
             class="event"
             :style="{
               background: getCourseColor(event.code),
-              height: getHeight,
+              height: getHeight
             }"
           >
             <h4>{{ event.code }}</h4>
