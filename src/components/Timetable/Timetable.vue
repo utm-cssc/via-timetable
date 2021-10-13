@@ -286,6 +286,7 @@ export default {
               timeToEvents[[event.currStart,event.end]].push(event)
             }else {
               timeToEvents[[event.currStart,event.end]] = [event]
+              result.push(event);
             }
           }else {
             // Half an hour edge case
@@ -295,9 +296,10 @@ export default {
               timeToEvents[[event.currStart,offset]].push(event)
             }else {
               timeToEvents[[event.currStart,offset]] = [event]
+              result.push(event);
             }
           }
-          result.push(event);
+          
         }
 
         currTime = eventEnd;
