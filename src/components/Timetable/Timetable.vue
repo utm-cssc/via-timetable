@@ -39,16 +39,29 @@
               <div
                 v-for="event in getEventsForDay(meetingSections)"
                 :key="event.start"
+                class="test"
+                :style="`
+              display: ${event.start > 0 ? 'flex': ''};
+            `"
               >
-                <timetable-event
-                  :event="event"
+                <template
+                  :v-if="event.start > 0"
+                >
+                  <template
+                    v-for="course in event.courses"
+                  >
+                  <timetable-event
+                  :key="course.code"
+                  :event="course"
                   :semester="semester"
-                  v-if="event.start > 0"
+
                 />
+                  </template>
+                </template>
                 <timetable-event
                   :event="event"
                   :semester="semester"
-                  v-else
+                  v-if="event.start < 0"
                   :currDay="day"
                 />
               </div>
@@ -192,6 +205,7 @@ export default {
         }
         return result;
       }
+      const timeToEvents = {}
       for (let i = 0; i < meetingSections.length; i += 1) {
         const event = meetingSections[i];
         const eventStart = convertSecondsToHours(event.start);
@@ -267,6 +281,22 @@ export default {
           invalidStart -= 1;
         } else {
           event.currStart = event.start;
+          if (Number.isInteger(currTime)){
+            if (timeToEvents[[event.currStart,event.end]]){
+              timeToEvents[[event.currStart,event.end]].push(event)
+            }else {
+              timeToEvents[[event.currStart,event.end]] = [event, event]
+            }
+          }else {
+            // Half an hour edge case
+            // eslint-disable-next-line no-lonely-if
+            const offset = (event.end / 3600 + 0.5) * 3600
+            if (timeToEvents[[event.currStart,offset]]){
+              timeToEvents[[event.currStart,offset]].push(event)
+            }else {
+              timeToEvents[[event.currStart,offset]] = [event]
+            }
+          }
           result.push(event);
         }
 
@@ -298,7 +328,17 @@ export default {
           }
         }
       }
-      return result;
+       return result.map(curEvent => {
+        if (curEvent.start < 0){
+          return curEvent
+        }
+        return {
+          currStart: curEvent.currStart,
+          currEnd: curEvent.end,
+          start: curEvent.start,
+          courses: timeToEvents[[curEvent.currStart,curEvent.end]]
+        }
+      });
     },
   },
 };
