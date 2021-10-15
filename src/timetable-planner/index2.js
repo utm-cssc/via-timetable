@@ -18,7 +18,7 @@ const lockSectionOfCourse = (courseSections, lockSections) => {
       // const lockedSection = section.slice()
       if (course.code === section.slice(0, section.length - 5)) {
         if (section[section.length - 5] === 'L') {
-          const lecture = course.lecture.find(lec => lec.sectionCode === section.slice(section.length - 5));
+          // const lecture = course.lecture.find(lec => lec.sectionCode === section.slice(section.length - 5));
           for (const lecture of course.lecture) {
             if (lecture.sectionCode === section.slice(section.length - 5)) {
               course.lecture = [lecture];
