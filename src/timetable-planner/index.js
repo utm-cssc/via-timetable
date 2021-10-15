@@ -1604,6 +1604,7 @@ const generateTimetables = (
   lockSectionOfCourse(winterCourseSections, winterLockSections);
   sortCourses(fallCourseSections, online);
   sortCourses(winterCourseSections, online);
+  
   let timetables = createTimetable(
     fallCourseSections,
     winterCourseSections,
