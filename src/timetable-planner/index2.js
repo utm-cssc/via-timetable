@@ -184,7 +184,7 @@ const checkNoOverlap = (courseTimings1, courseTimings2) => {
   // Get all times for courseTimings1
   for (const time1 of courseTimings1) {
     for (const time2 of courseTimings2) {
-      if ((time1.day === time2.day && time1.term === time2.term) || (time1.term === YEAR || time2.term === YEAR)) {
+      if (time1.day === time2.day && (time1.term === time2.term || (time1.term === YEAR || time2.term === YEAR))) {
         if (existsOverlap(time1.start, time1.end, time2.start, time2.end)) return false;
       }
     }
