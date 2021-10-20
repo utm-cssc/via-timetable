@@ -523,13 +523,13 @@ export default new Vuex.Store({
         context.state.winterSelectedCourses,
       ).map(code => context.state.winterSelectedCourses[code]);
 
-      console.log(context.state.allowedConflictCourses);
       const timetables = generateTimetables(
         fallCourses,
         context.state.fallLockedSections,
         winterCourses,
         context.state.winterLockedSections,
         context.state.deliveryMethod,
+        context.state.allowedConflictCourses
       );
 
       context.dispatch('validateTimetable', timetables);
@@ -548,9 +548,9 @@ export default new Vuex.Store({
 
       // Remove from allowed conflict courses
       if (
-        context.state.allowedConflictCourses.find(
+        context.state.allowedConflictCourses.findIndex(
           course => course.code === payload.code,
-        )
+        ) !== -1
       ) {
         context.commit('addOrRemoveConflictCourse', payload);
       }
