@@ -218,6 +218,14 @@ const mapCourseSections = courseSections =>
     ({ ...oldSections, [curCourseSection.code]: curCourseSection })
   , {});
 
+  /**
+   * adds a course to the approriate timetable
+   * @param {*} course - the course to be added
+   * @param {*} mapping - a mapping from course to it's metadata
+   * @param {*} timingIndex - the index at which the selected time was chosen
+   * @param {*} type - the current type, LEC, PRA, TUT
+   * @param {*} curTimeTable - the current working timetable
+   */
 const addCourseToTimetable = (course,mapping, timingIndex, type, curTimeTable) => {
   const {code, lecture, practical, tutorial } = mapping[course];
   let sectionInformation;
@@ -250,6 +258,7 @@ const generateTimetables = (
   winterCourses,
   winterLockSections,
   online,
+  excludedConflictCourses = [],
 ) => {
   // Generate all valid combinations of MeetingSections for a course
   const fallCourseSections = fallCourses.map(course =>
@@ -275,6 +284,7 @@ const generateTimetables = (
   const constraints = [];
   const uniqueCoursesList = Object.keys(uniqueCourses);
   // Generate constraints for no overlapping
+  const mapExcludedCourses = mapCourseSections(excludedConflictCourses);
   for (
     let courseOneIndex = 0;
     courseOneIndex < uniqueCoursesList.length;
@@ -287,8 +297,11 @@ const generateTimetables = (
     ) {
       const uniqueCourseOne = uniqueCoursesList[courseOneIndex];
       const uniqueCourseTwo = uniqueCoursesList[courseTwoIndex];
-
-      constraints.push([uniqueCourseOne, uniqueCourseTwo, checkNoOverlap]);
+      const courseCodeOne = uniqueCourseOne.slice(0,9);
+      const courseCodeTwo = uniqueCourseTwo.slice(0,9);
+      if (mapExcludedCourses[courseCodeOne] === undefined && mapExcludedCourses[courseCodeTwo] === undefined){
+        constraints.push([uniqueCourseOne, uniqueCourseTwo, checkNoOverlap]);
+      }
     }
   }
 
