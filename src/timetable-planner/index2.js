@@ -1,11 +1,9 @@
-import {sortCourseSection} from "./combinations/combinations";
+import sortCourseSection from './combinations/combinations';
 import cspSolve from './csp';
-
 
 /**
  * Helper functions
  */
-
 
 /**
  * Eliminates the section of the courses based on the locksections
@@ -84,7 +82,6 @@ const sortCourses = (courses, online) => {
   courses.sort((a, b) => (a.practical.length > b.practical.length ? 1 : -1));
 };
 
-
 /**
  * Get all times that a single offering is offered for.
  * Returns an array of times that this offering is offered.
@@ -92,13 +89,16 @@ const sortCourses = (courses, online) => {
  */
 const getOfferingTime = (offering, term) => {
   const times = [];
-  for (const [day, start, end] of offering.times) {
+  for (const { day, start, end } of offering.times) {
     times.push({
-      day, end, start, term
+      day,
+      end,
+      start,
+      term,
     });
   }
   return times;
-}
+};
 
 /**
  * Get all offering times for {offerings}.
@@ -106,36 +106,45 @@ const getOfferingTime = (offering, term) => {
  */
 const getAllOfferingTimes = (offerings, term) => {
   const times = [];
+  let counter = 0;
   for (const offering of offerings) {
-    times.push(getOfferingTime(offering, term));
+    times.push({ time: getOfferingTime(offering, term), index: counter });
+    counter += 1;
   }
   return times;
-}
+};
 
 /**
  * Get all unique courses and locks from both terms course sections.
  * @param fallCourses
- * @param winterCourses 
+ * @param winterCourses
  * are arrays containing {code, lecture, tutorial, practical}
- * 
+ *
  * @return an object containing {uniqueCourses, locks}.
  * Each time stores {start, end, day, term}
  * @uniqueCourses is an object of the following format:
- * {'CSC108PRA': [[...times for PRA9101], [...times for PRA9102]], 
- * 'CSC108LEC': [...], 
- * 'CSC108TUT': [...], 
- * 'MAT102LEC': [...], 
+ * {'CSC108PRA': [[...times for PRA9101], [...times for PRA9102]],
+ * 'CSC108LEC': [...],
+ * 'CSC108TUT': [...],
+ * 'MAT102LEC': [...],
  * ...
  * }
- * 
+ *
  * @lock is an array of times containing all times which are blocked off.
  */
 
 const getUniqueCourses = (fallCourses, winterCourses) => {
   const uniqueCourses = {};
   const locks = [];
-  const [LOCK_STRING, LOCK_TERM_INDEX, COURSE_TERM_INDEX, LEC, PRA, TUT] = ["Lock", 4, 8, "LEC","PRA","TUT"];
-  
+  const [LOCK_STRING, LOCK_TERM_INDEX, COURSE_TERM_INDEX, LEC, PRA, TUT] = [
+    'Lock',
+    4,
+    8,
+    'LEC',
+    'PRA',
+    'TUT',
+  ];
+
   /**
    * Add this course's offering to the uniqueCourses array if needed.
    */
@@ -143,55 +152,88 @@ const getUniqueCourses = (fallCourses, winterCourses) => {
     if (offering.length !== 0 && !(code + type in uniqueCourses)) {
       uniqueCourses[code + type] = getAllOfferingTimes(offering, term);
     }
-  }
+  };
   /**
    * For each "course" (really, it's either a course or a lock).
-   * Filter out the duplicate courses and add their times. 
-   * If it is a course then add it in uniqueCourses. 
+   * Filter out the duplicate courses and add their times.
+   * If it is a course then add it in uniqueCourses.
    * If it is a lock, then add it to the lock array.
    */
-  const filter = (course) => {
+  const filter = course => {
     // Add to the time to locks array.
     if (course.code.startsWith(LOCK_STRING)) {
-      locks.push(getOfferingTime(course.lecture, course.code[LOCK_TERM_INDEX]));
+      locks.push(
+        getOfferingTime(course.lecture[0], course.code[LOCK_TERM_INDEX]),
+      );
     }
-    // Add the course to the unique courses  
+    // Add the course to the unique courses
     else {
-      const term = course.code[COURSE_TERM_INDEX]
+      const term = course.code[COURSE_TERM_INDEX];
       // Add lecture, practical, tutorials to uniqueCourses if needed.
       addToUniqueCourses(course.lecture, course.code, LEC, term);
       addToUniqueCourses(course.practical, course.code, PRA, term);
       addToUniqueCourses(course.tutorial, course.code, TUT, term);
     }
-  }
+  };
   fallCourses.forEach(course => {
     filter(course);
   });
   winterCourses.forEach(course => {
     filter(course);
   });
-  return {uniqueCourses, locks};
-}
+  return { uniqueCourses, locks };
+};
 
 /**
  * Checks if two course timings have no overlaps.
  * @returns true if no overlap, false otherwise.
  */
 const checkNoOverlap = (courseTimings1, courseTimings2) => {
-  const YEAR = "Y";
+  const YEAR = 'Y';
   // Check if (start, end) is in between (start2, end2).
-  const existsOverlap = (start, end, start2, end2) => (start >= start2 && start <= end2) || (end >= start2 && end <= end2);
+  const existsOverlap = (start, end, start2, end2) =>
+    (start >= start2 && start <= end2) || (end >= start2 && end <= end2);
   // Get all times for courseTimings1
-  for (const time1 of courseTimings1) {
-    for (const time2 of courseTimings2) {
-      if (time1.day === time2.day && (time1.term === time2.term || (time1.term === YEAR || time2.term === YEAR))) {
-        if (existsOverlap(time1.start, time1.end, time2.start, time2.end)) return false;
+  for (const time1 of courseTimings1.time) {
+    for (const time2 of courseTimings2.time) {
+      if (
+        time1.day === time2.day &&
+        (time1.term === time2.term ||
+          time1.term === YEAR || time2.term === YEAR)
+      ) {
+        if (existsOverlap(time1.start, time1.end, time2.start, time2.end))
+          return false;
       }
     }
   }
   return true;
-}
+};
 
+/**
+ * Maps course sections to dictionary
+ * @returns a dicitonary of course Code to section
+ */
+const mapCourseSections = courseSections =>
+  courseSections.reduce((oldSections, curCourseSection) => 
+    ({ ...oldSections, [curCourseSection.code]: curCourseSection })
+  , {});
+
+const addCourseToTimetable = (course,mapping, timingIndex, type, curTimeTable) => {
+  const {code, lecture, practical, tutorial } = mapping[course];
+  let sectionInformation;
+  if (type === 'LEC'){
+    sectionInformation = lecture[timingIndex];
+ }else if (type === 'PRA'){
+  sectionInformation = practical[timingIndex];
+ }else {
+  sectionInformation = tutorial[timingIndex];
+ }
+ const { method, sectionCode, times, instructors } = sectionInformation;
+ const newCourseSection = { method, sectionCode, code, instructors };
+ for (const time of times){
+   curTimeTable[time.day].push({...time, ...newCourseSection});
+ }
+}
 /**
  *
  * The main function.
@@ -221,31 +263,91 @@ const generateTimetables = (
   sortCourses(fallCourseSections, online);
   sortCourses(winterCourseSections, online);
   // Have unique courses.
-  // 
+  //
   // right here
   // For every unique course we need this:
   // CSC108 -> {'CSC108Prac': [...timings], 'CSC108Lec'[...]], 'CSC108Tut': [...timings]}
-  const {uniqueCourses, locks } = getUniqueCourses(fallCourseSections, winterCourseSections);
+  const { uniqueCourses, locks } = getUniqueCourses(
+    fallCourseSections,
+    winterCourseSections,
+  );
 
-  const constraints = []
-  const uniqueCoursesList = uniqueCourses.keys();
+  const constraints = [];
+  const uniqueCoursesList = Object.keys(uniqueCourses);
   // Generate constraints for no overlapping
-  for (let courseOneIndex = 0; courseOneIndex < uniqueCoursesList.length; courseOneIndex +=1) {
-    for (let courseTwoIndex = courseOneIndex; courseTwoIndex < uniqueCoursesList.length; courseTwoIndex += 1){
+  for (
+    let courseOneIndex = 0;
+    courseOneIndex < uniqueCoursesList.length;
+    courseOneIndex += 1
+  ) {
+    for (
+      let courseTwoIndex = courseOneIndex + 1;
+      courseTwoIndex < uniqueCoursesList.length;
+      courseTwoIndex += 1
+    ) {
       const uniqueCourseOne = uniqueCoursesList[courseOneIndex];
       const uniqueCourseTwo = uniqueCoursesList[courseTwoIndex];
-      
-      constraints.push([uniqueCourseOne, uniqueCourseTwo, checkNoOverlap])
+
+      constraints.push([uniqueCourseOne, uniqueCourseTwo, checkNoOverlap]);
     }
   }
 
-  // Generate constraints for locks
+  const newUniqueCourses = {};
+  for (const [course, timings] of Object.entries(uniqueCourses)) {
+    let newTimes = timings;
+    for (const lock of locks) {
+      newTimes = newTimes.filter(timing => checkNoOverlap({ time: lock }, timing));
+    }
+    newUniqueCourses[course] = newTimes;
+  }
 
   // solve it
+  const csp = { variables: newUniqueCourses, constraints };
+  const cspResult = cspSolve(csp);
+
+  // Checks if it failed to create one
+  if (cspResult === 'FAILURE') {
+    return null;
+  }
 
   // convert this to time table
+  const winterTimetable = {
+    MONDAY: [],
+    TUESDAY: [],
+    WEDNESDAY: [],
+    THURSDAY: [],
+    FRIDAY: [],
+  };
 
-    
+  const fallTimetable = {
+    MONDAY: [],
+    TUESDAY: [],
+    WEDNESDAY: [],
+    THURSDAY: [],
+    FRIDAY: [],
+  };
+
+  const fallMapping = mapCourseSections(fallCourseSections);
+  const winterMapping = mapCourseSections(winterCourseSections);
+  for (const [course, { index: timeIndex }] of Object.entries(cspResult)) {
+    const courseCode = course.slice(0, 9);
+    const term = course.charAt(8);
+    const type = course.slice(9);
+
+    if (term === 'Y' || term === 'F') {
+      addCourseToTimetable(courseCode,fallMapping,timeIndex,type,fallTimetable);
+    }
+    if (term === 'Y' || term === 'S') {
+      addCourseToTimetable(courseCode,winterMapping,timeIndex,type,winterTimetable);
+    }
+  }
+
+  const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
+  for (const day of days) {
+    fallTimetable[day].sort((a, b) => a.start - b.start);
+    winterTimetable[day].sort((a, b) => a.start - b.start);
+  }
+  return [fallTimetable, winterTimetable];
 };
-
+export { generateTimetables };
 export default generateTimetables;

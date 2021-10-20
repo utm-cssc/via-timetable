@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import genColor from 'color-generator';
-import { generateTimetables } from '../timetable-planner';
+import { generateTimetables } from '../timetable-planner/index2';
 // import colorDiff from "color-difference"
 
 Vue.use(Vuex);
