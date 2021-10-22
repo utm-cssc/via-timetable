@@ -1,12 +1,7 @@
 <template>
   <div :style="contentHeight">
     <v-row class="fill-height" justify="center" align="center">
-      <v-img
-        @click="$router.push({ name: 'about' })"
-        src="../assets/coming-soon.png"
-        :max-width="imgWidth"
-        style="cursor: pointer;"
-      />
+      Program
     </v-row>
   </div>
 </template>

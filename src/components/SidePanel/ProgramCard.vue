@@ -16,10 +16,20 @@
         <p></p>
       </div>
       <div style="color: #474747">
-        <h3>{{ program.programCode }}</h3>
+        <h3>{{ program.name }}</h3>
       </div>
       <v-spacer />
     </v-expansion-panel-header>
+    <v-expansion-panel-content>
+        <hr class="mb-1" />
+        <div class="pa-3">
+            <v-row>
+                <div style="font-size: 15px">
+                {{ program.programCode }}
+                </div>
+            </v-row>
+        </div>
+    </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 

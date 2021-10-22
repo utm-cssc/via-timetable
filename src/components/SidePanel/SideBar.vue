@@ -47,6 +47,7 @@
         <smooth-scrollbar class="right-scroll-area">
           <v-expansion-panels
             :v-model="whichCoursesExpanded"
+            v-if="programTab == 0"
             multiple
             hover
             class="pa-1"
@@ -56,6 +57,15 @@
               :key="program"
               :program="program"
             />
+          </v-expansion-panels>
+          <v-expansion-panels
+            :v-model="whichCoursesExpanded"
+            v-else
+            multiple
+            hover
+            class="pa-1"
+          >
+            Swag
           </v-expansion-panels>
         </smooth-scrollbar>
       </v-row>
@@ -118,10 +128,12 @@ export default {
     filterPrograms() {
       return [
         {
+          name: "Computer Science Specialist",
           color: "blue",
           programCode: "ERSPE1688"
         },
         {
+          name: "Math Minor",
           color: "red",
           programCode: "ERMIN2511"
         }
