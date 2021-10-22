@@ -4,7 +4,9 @@
       <v-row class="px-4">
         <h1 class="text-h6 ma-3">{{ sideBarTitle }}</h1>
         <v-spacer class="ma-3" />
-        <div class="ma-3">{{ Object.keys(filterCourses).length * 0.5 }} credit(s)</div>
+        <div class="ma-3">
+          {{ Object.keys(filterCourses).length * 0.5 }} credit(s)
+        </div>
       </v-row>
       <hr class="mb-1" />
       <v-row
@@ -30,19 +32,50 @@
         </smooth-scrollbar>
       </v-row>
     </v-card>
+    <v-card :height="programPanelHeight" class="mt-3 pa-4">
+      <v-tabs grow v-model="programTab">
+        <v-tab>PROGRAMS</v-tab>
+        <v-tab>COURSES</v-tab>
+      </v-tabs>
+      <v-row
+        justify="center"
+        align="center"
+        :style="`height: ${coursePanelHeight * 0.85}px`"
+        style="z-index: -1"
+      >
+        <img :src="imgSrc" style="position: absolute" :width="imgWidth" />
+        <smooth-scrollbar class="right-scroll-area">
+          <v-expansion-panels
+            :v-model="whichCoursesExpanded"
+            multiple
+            hover
+            class="pa-1"
+          >
+            <program-card
+              v-for="program in filterPrograms"
+              :key="program"
+              :program="program"
+            />
+          </v-expansion-panels>
+        </smooth-scrollbar>
+      </v-row>
+    </v-card>
   </div>
 </template>
 <script>
 import { mapGetters } from 'vuex';
 import SelectedCourseCard from './SelectedCourseCard.vue';
+import ProgramCard from './ProgramCard.vue';
 
 export default {
   components: {
     SelectedCourseCard,
+    ProgramCard,
   },
   data() {
     return {
       whichCoursesExpanded: [],
+      programTab: 0,
     };
   },
   computed: {
@@ -80,9 +113,20 @@ export default {
           filteredCourses[code] = this.selectedCourses('')[code];
         }
       }
-
       return filteredCourses;
     },
+    filterPrograms() {
+      return [
+        {
+          color: "blue",
+          programCode: "ERSPE1688"
+        },
+        {
+          color: "red",
+          programCode: "ERMIN2511"
+        }
+      ]
+    }
   },
 };
 </script>
