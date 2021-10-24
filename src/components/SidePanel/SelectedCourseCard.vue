@@ -1,17 +1,19 @@
 <template>
   <v-expansion-panel
-    style="min-width: 98%; border-radius: 5px !important;"
+    style="min-width: 98%; border-radius: 5px !important"
     class="mb-1"
   >
     <v-expansion-panel-header
       class="pa-0 pr-2"
-      style="max-height: 50px !important; border-top-left-radius: 5px; border-bottom-left-radius: 5px;"
+      style="
+        max-height: 50px !important;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      "
     >
       <div
         class="mr-3 card-header"
-        :style="
-          `background-color: ${course.color};  border-top-left-radius: 5px; border-bottom-left-radius: 5px;`
-        "
+        :style="`background-color: ${course.color};  border-top-left-radius: 5px; border-bottom-left-radius: 5px;`"
       >
         <p></p>
       </div>
@@ -147,8 +149,9 @@ export default {
         e = 12;
       }
       const endHalf = Number.isInteger(e) ? '00' : '30';
-      return `${s - startHalf / 6 / 10}:${startHalf} - ${e -
-        endHalf / 6 / 10}:${endHalf}`;
+      return `${s - startHalf / 6 / 10}:${startHalf} - ${
+        e - endHalf / 6 / 10
+      }:${endHalf}`;
     },
     getProperDayName(day) {
       return `${day.slice(0, 1)}${day.slice(1, 3).toLowerCase()}`;

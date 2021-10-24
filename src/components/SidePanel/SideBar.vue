@@ -13,7 +13,7 @@
         justify="center"
         align="center"
         :style="`height: ${coursePanelHeight * 0.85}px`"
-        style="z-index: -1"
+        style="z-index: -1; overflow-y: auto"
       >
         <img :src="imgSrc" style="position: absolute" :width="imgWidth" />
         <smooth-scrollbar class="right-scroll-area">
@@ -34,34 +34,26 @@
     </v-card>
     <v-card :height="programPanelHeight" class="mt-3 pa-4">
       <v-tabs grow v-model="programTab">
-        <v-tab>PROGRAMS</v-tab>
+        <v-tab>DEGREE</v-tab>
         <v-tab>COURSES</v-tab>
       </v-tabs>
       <v-row
         justify="center"
         align="center"
         :style="`height: ${coursePanelHeight * 0.85}px`"
-        style="z-index: -1"
+        style="z-index: -1; overflow-y: auto"
       >
         <smooth-scrollbar v-if="programTab == 0" class="program-scroll-area">
-          <v-expansion-panels
-            multiple
-            hover
-            class="pa-1"
-          >
+          <v-expansion-panels multiple hover class="pa-1">
             <program-card
               v-for="program in filterPrograms"
-              :key="program"
+              :key="program.desc"
               :program="program"
             />
           </v-expansion-panels>
         </smooth-scrollbar>
         <smooth-scrollbar v-else class="program-scroll-area">
-          <v-expansion-panels
-            multiple
-            hover
-            class="pa-1"
-          >
+          <v-expansion-panels multiple hover class="pa-1">
             Swag
           </v-expansion-panels>
         </smooth-scrollbar>
@@ -73,6 +65,8 @@
 import { mapGetters } from 'vuex';
 import SelectedCourseCard from './SelectedCourseCard.vue';
 import ProgramCard from './ProgramCard.vue';
+
+import programs from "../../constants";
 
 export default {
   components: {
@@ -123,28 +117,7 @@ export default {
       return filteredCourses;
     },
     filterPrograms() {
-      return [
-        {
-          name: 'Computer Science Specialist',
-          color: 'blue',
-          programCode: 'ERSPE1688',
-          requirements: [
-            {
-              desc: 'All of CSC108H5 and CSC148H5 and MAT102H5',
-            },
-            {
-              desc: 'All of CSC108H5 and CSC148H5 and MAT102H5',
-            },
-            
-          ],
-        },
-        {
-          name: 'Math Minor',
-          color: 'red',
-          programCode: 'ERMIN2511',
-          requirements: [],
-        },
-      ];
+      return programs;
     },
   },
 };

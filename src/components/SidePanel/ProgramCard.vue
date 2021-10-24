@@ -18,7 +18,7 @@
         <p></p>
       </div>
       <div style="color: #474747">
-        <h3>{{ program.name }} ({{ program.programCode }}) 50%</h3>
+        <h3>{{ program.name }} ({{ program.programCode }})</h3>
       </div>
       <v-spacer />
     </v-expansion-panel-header>
@@ -26,21 +26,16 @@
       <hr class="mb-1" />
       <div class="pa-3">
         <v-row>
-          <div style="font-size: 15px">Requirements:</div>
-          <v-row
+          Completion:
+          <v-progress-linear :value="`${program.progress}`" />
+        </v-row>
+        <v-row>
+          <div class="mb-1" style="font-size: 15px">Requirements:</div>
+          <requirement
             v-for="requirement in program.requirements"
             :key="`${requirement.desc}`"
-            style="font-size: small"
-          >
-            <v-col cols="3">
-              <v-chip color="yellow">IPR</v-chip>
-            </v-col>
-            <v-col >
-              <p>
-                {{ requirement.desc }}
-              </p>
-            </v-col>
-          </v-row>
+            :requirement="requirement"
+          />
         </v-row>
       </div>
     </v-expansion-panel-content>
@@ -48,8 +43,13 @@
 </template>
 
 <script>
+import Requirement from './Requirement.vue';
+
 export default {
   name: 'program-card',
+  components: {
+    Requirement,
+  },
   props: {
     program: {
       type: Object,
