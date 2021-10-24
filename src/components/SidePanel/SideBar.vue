@@ -43,11 +43,8 @@
         :style="`height: ${coursePanelHeight * 0.85}px`"
         style="z-index: -1"
       >
-        <img :src="imgSrc" style="position: absolute" :width="imgWidth" />
-        <smooth-scrollbar class="right-scroll-area">
+        <smooth-scrollbar v-if="programTab == 0" class="program-scroll-area">
           <v-expansion-panels
-            :v-model="whichCoursesExpanded"
-            v-if="programTab == 0"
             multiple
             hover
             class="pa-1"
@@ -58,9 +55,9 @@
               :program="program"
             />
           </v-expansion-panels>
+        </smooth-scrollbar>
+        <smooth-scrollbar v-else class="program-scroll-area">
           <v-expansion-panels
-            :v-model="whichCoursesExpanded"
-            v-else
             multiple
             hover
             class="pa-1"
@@ -98,10 +95,10 @@ export default {
       }
     },
     coursePanelHeight() {
-      return (window.innerHeight - 99) * 0.6;
+      return (window.innerHeight - 99) * 0.5;
     },
     programPanelHeight() {
-      return (window.innerHeight - 99) * 0.4;
+      return (window.innerHeight - 99) * 0.5;
     },
     imgWidth() {
       return window.innerWidth * 0.17;
@@ -128,22 +125,40 @@ export default {
     filterPrograms() {
       return [
         {
-          name: "Computer Science Specialist",
-          color: "blue",
-          programCode: "ERSPE1688"
+          name: 'Computer Science Specialist',
+          color: 'blue',
+          programCode: 'ERSPE1688',
+          requirements: [
+            {
+              desc: 'All of CSC108H5 and CSC148H5 and MAT102H5',
+            },
+            {
+              desc: 'All of CSC108H5 and CSC148H5 and MAT102H5',
+            },
+            
+          ],
         },
         {
-          name: "Math Minor",
-          color: "red",
-          programCode: "ERMIN2511"
-        }
-      ]
-    }
+          name: 'Math Minor',
+          color: 'red',
+          programCode: 'ERMIN2511',
+          requirements: [],
+        },
+      ];
+    },
   },
 };
 </script>
 <style scoped>
 .right-scroll-area {
+  position: relative;
+  height: 90% !important;
+  background-color: transparent;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.program-scroll-area {
   position: relative;
   height: 90% !important;
   background-color: transparent;
