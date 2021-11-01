@@ -280,7 +280,6 @@ const generateTimetables = (
     fallCourseSections,
     winterCourseSections,
   );
-
   const constraints = [];
   const uniqueCoursesList = Object.keys(uniqueCourses);
   // Generate constraints for no overlapping
@@ -313,7 +312,6 @@ const generateTimetables = (
     }
     newUniqueCourses[course] = newTimes;
   }
-
   // solve it
   const csp = { variables: newUniqueCourses, constraints };
   const cspResult = cspSolve(csp);
@@ -360,6 +358,7 @@ const generateTimetables = (
     fallTimetable[day].sort((a, b) => a.start - b.start);
     winterTimetable[day].sort((a, b) => a.start - b.start);
   }
+
   return [fallTimetable, winterTimetable];
 };
 export { generateTimetables };
