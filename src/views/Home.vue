@@ -104,11 +104,13 @@ export default {
   },
   watch: {
     whichTab() {
-      if (this.whichTab === 0) {
+      const currPath = this.$router.history.current.name;
+      if (this.whichTab === 0 && currPath !== 'timetable') {
         this.$router.push({ name: 'timetable' });
-      } else if (this.whichTab === 1) {
+      } else if (this.whichTab === 1 && currPath !== 'program') {
         this.$router.push({ name: 'program' });
       }
+      localStorage.tab = this.whichTab;
     },
   },
   created() {

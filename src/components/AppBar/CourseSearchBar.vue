@@ -8,7 +8,7 @@
     class="ma-2 ml-2 mr-2"
     hide-no-data
     hide-details
-    :placeholder="!loading ? 'Search for a Course' : 'Loading . . .'"
+    :placeholder="!loading ? 'Search' : 'Loading . . .'"
     :loading="loading"
     :autofocus="false"
     solo-inverted
