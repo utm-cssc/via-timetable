@@ -50,12 +50,22 @@
                   <template
                     v-for="course in event.courses"
                   >
-                  <timetable-event
-                  :key="course.code"
-                  :event="course"
-                  :semester="semester"
+                    <template
+                      :v-if="course.start > 0"
+                    >
+                      <timetable-event
+                      :key="course.code"
+                      :event="course"
+                      :semester="semester"
 
-                />
+                      />
+                    </template>
+                    <timetable-event
+                      :key="course.start"
+                      :event="course"
+                      :semester="semester"
+                      v-if="course.start < 0"
+                    />
                   </template>
                 </template>
                 <timetable-event
@@ -194,6 +204,7 @@ export default {
 
         return eventStart < this.timetableStart || eventEnd > this.timetableEnd;
       });
+      // If the timetable is empty, then start is < 0, so flag would be true. 
       if (meetingSections.length === 0 || flag) {
         for (let j = 0; j < this.timetableEnd - this.timetableStart; j += 1) {
           result.push({
@@ -205,12 +216,14 @@ export default {
         }
         return result;
       }
+      // We have some courses. 
       const timeToEvents = {}
       for (let i = 0; i < meetingSections.length; i += 1) {
         const event = meetingSections[i];
         const eventStart = convertSecondsToHours(event.start);
         const eventEnd = convertSecondsToHours(event.end);
-
+        // Set current end
+        event.currEnd = event.end;
         // if the current locked event starts before the timetable start time
         if (eventStart < this.timetableStart) {
           // eslint-disable-next-line no-continue
@@ -282,20 +295,20 @@ export default {
         } else {
           event.currStart = event.start;
           if (Number.isInteger(currTime)){
-            if (timeToEvents[[event.currStart,event.end]]){
-              timeToEvents[[event.currStart,event.end]].push(event)
+            if (timeToEvents[[event.currStart]]){
+              timeToEvents[[event.currStart]].push(event)
             }else {
-              timeToEvents[[event.currStart,event.end]] = [event]
+              timeToEvents[[event.currStart]] = [event]
               result.push(event);
             }
           }else {
             // Half an hour edge case
+            // const offset = (event.end / 3600 + 0.5) * 3600
             // eslint-disable-next-line no-lonely-if
-            const offset = (event.end / 3600 + 0.5) * 3600
-            if (timeToEvents[[event.currStart,offset]]){
-              timeToEvents[[event.currStart,offset]].push(event)
+            if (timeToEvents[[event.currStart]]){
+              timeToEvents[[event.currStart]].push(event)
             }else {
-              timeToEvents[[event.currStart,offset]] = [event]
+              timeToEvents[[event.currStart]] = [event]
               result.push(event);
             }
           }
@@ -330,17 +343,58 @@ export default {
           }
         }
       }
-       return result.map(curEvent => {
-        if (curEvent.start < 0){
-          return curEvent
+      // Result is sorted by currStart already.
+
+            // Sort every event by start time
+      // result.push({start: 37800, currStart: 37800, end: 46800});
+      result.sort((a, b) => a.currStart - b.currStart);
+      // Need to find the biggest overlapping section. 
+      const sortedTimeEvents = [];
+      // current start and end times. 
+      let end;
+
+      for(let i = 0; i < result.length; i+=1){
+        // if the start time is < 0, it's empty block. 
+        if (result[i].start < 0) {
+          sortedTimeEvents.push(result[i]);
         }
-        return {
-          currStart: curEvent.currStart,
-          currEnd: curEvent.end,
-          start: curEvent.start,
-          courses: timeToEvents[[curEvent.currStart,curEvent.end]]
+        // If start time > 0, it's an actual course and we need to find max overlap. 
+        else {
+          end = result[i].end;
+          // Contains all courses overlapping from a given range (s, e)
+          const overlappingCourses = [result[i]];
+          // Loop through next course onwards to find max overlap.
+          let j;
+          for (j=i+1; j < result.length; j+=1) {
+            // This course is not overlapping anymore, so get the out of this loop
+            if (result[j].currStart >= end){
+              break;
+            }
+            // The course is overlapping. 
+            // Update the end value to be the greater of current end or new end
+            end = result[j].end > end ? result[j].end : end;
+            // Add this new overlapping course. 
+            overlappingCourses.push(result[j]);
+          }
+          // Update all of the courses' ends (overlap period's end) and currEnd (each courses' end)
+          for (let k = 0; k < overlappingCourses.length; k+=1) {
+            overlappingCourses[k].olap_end = end;
+            overlappingCourses[k].olap_start = result[i].start;
+          }
+
+          // Push the new result. 
+          sortedTimeEvents.push({
+          currStart: result[i].currStart,
+          currEnd: end,
+          start: result[i].start,
+          courses: overlappingCourses
+          });
+          // Update the i value, since we already looked at the next courses. 
+          i = j-1;
         }
-      });
+      }
+      return sortedTimeEvents;
+
     },
   },
 };
