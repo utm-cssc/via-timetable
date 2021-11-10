@@ -374,6 +374,7 @@ const generateTimetables = (
     winterTimetable[day].sort((a, b) => a.start - b.start);
   }
 
+
   return [fallTimetable, winterTimetable];
 };
 export { generateTimetables };
