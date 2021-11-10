@@ -209,6 +209,22 @@ const checkNoOverlap = (courseTimings1, courseTimings2) => {
   return true;
 };
 
+const addCourseToTimetable = (course,mapping, timingIndex, type, curTimeTable) => {
+  const {code, lecture, practical, tutorial } = mapping[course];
+  let sectionInformation;
+  if (type === 'LEC'){
+    sectionInformation = lecture[timingIndex];
+ }else if (type === 'PRA'){
+  sectionInformation = practical[timingIndex];
+ }else {
+  sectionInformation = tutorial[timingIndex];
+ }
+ const { method, sectionCode, times, instructors } = sectionInformation;
+ const newCourseSection = { method, sectionCode, code, instructors };
+ for (const time of times){
+   curTimeTable[time.day].push({...time, ...newCourseSection});
+ }
+}
 /**
  * Maps course sections to dictionary
  * @returns a dicitonary of course Code to section
@@ -312,8 +328,6 @@ const generateTimetables = (
     }
     newUniqueCourses[course] = newTimes;
   }
-  // solve it
-  console.log(newUniqueCourses,Object.keys(newUniqueCourses), constraints);
   const csp = { variables: newUniqueCourses, constraints };
   const cspResult = cspSolve(csp);
 
