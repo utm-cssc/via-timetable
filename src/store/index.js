@@ -628,6 +628,7 @@ export default new Vuex.Store({
         winterCourses,
         context.state.winterLockedSections,
         context.state.deliveryMethod,
+        context.state.allowedConflictCourses
       );
 
       context.dispatch('validateTimetable', bothTimetables);

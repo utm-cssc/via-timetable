@@ -192,7 +192,7 @@ const checkNoOverlap = (courseTimings1, courseTimings2) => {
   const YEAR = 'Y';
   // Check if (start, end) is in between (start2, end2).
   const existsOverlap = (start, end, start2, end2) =>
-    (start >= start2 && start <= end2) || (end >= start2 && end <= end2);
+    (start >= start2 && start <= end2) || (end >= start2 && end <= end2) || (start2 <= start && end <= end2) || (start <= start2 && end2 <= end);
   // Get all times for courseTimings1
   for (const time1 of courseTimings1.time) {
     for (const time2 of courseTimings2.time) {
@@ -208,7 +208,6 @@ const checkNoOverlap = (courseTimings1, courseTimings2) => {
   }
   return true;
 };
-
 /**
  * Maps course sections to dictionary
  * @returns a dicitonary of course Code to section
@@ -312,9 +311,8 @@ const generateTimetables = (
     }
     newUniqueCourses[course] = newTimes;
   }
-  // solve it
   const csp = { variables: newUniqueCourses, constraints };
-  console.log(csp);
+  // console.log(csp);
   const cspResult = cspSolve(csp);
 
   // Checks if it failed to create one
