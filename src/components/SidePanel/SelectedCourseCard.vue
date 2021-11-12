@@ -18,7 +18,7 @@
       <div style="color: #474747">
         <h3>{{ course.courseCode }}</h3>
       </div>
-       <v-btn icon @click="addOrRemoveConflictCourse({code: course.courseCode } )" color="#474747" max-width="40" max-height="40">
+       <v-btn icon @click.native.stop @click="addOrRemoveConflictCourse({code: course.courseCode } )" color="#474747" max-width="40" max-height="40">
             <v-icon v-if="isConflict">mdi-book-multiple</v-icon>
             <v-icon v-else>mdi-book-variant</v-icon>
       </v-btn>
