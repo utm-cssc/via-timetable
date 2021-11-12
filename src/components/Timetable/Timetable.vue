@@ -216,184 +216,100 @@ export default {
         }
         return result;
       }
-      // We have some courses. 
-      const timeToEvents = {}
-      for (let i = 0; i < meetingSections.length; i += 1) {
-        const event = meetingSections[i];
-        const eventStart = convertSecondsToHours(event.start);
-        const eventEnd = convertSecondsToHours(event.end);
-        // Set current end
-        event.currEnd = event.end;
-        // if the current locked event starts before the timetable start time
-        if (eventStart < this.timetableStart) {
-          // eslint-disable-next-line no-continue
-          continue;
-        } else if (eventStart >= this.timetableEnd) {
-          break;
-        }
-
-        // Pad empty hour or half hours before the event
-        // If event starts at whole hour
-        if (Number.isInteger(eventStart - currTime)) {
-          for (let j = 0; j < eventStart - currTime; j += 1) {
-            result.push({
-              start: invalidStart,
-              currStart: (currTime + j) * 3600,
-              currEnd: (currTime + j + 1) * 3600,
-            });
-            invalidStart -= 1;
-          }
-        }
-        // If event starts at half hour
-        else {
-          // there is half hour exist
-          // previous end time is one hour
-          // eslint-disable-next-line no-lonely-if
-          if (Number.isInteger(currTime)) {
-            for (let j = 0; j < eventStart - currTime - 1; j += 1) {
-              result.push({
-                start: invalidStart,
-                currStart: (currTime + j) * 3600,
-                currEnd: (currTime + j + 1) * 3600,
-              });
-              invalidStart -= 1;
-            } // pushing in half hour
-            result.push({
-              start: invalidStart,
-              currStart: (eventStart - 0.5) * 3600,
-              currEnd: eventStart * 3600,
-            });
-            invalidStart -= 1;
-            // previous end time is full hour
-          } else {
-            result.push({
-              start: invalidStart,
-              currStart: currTime * 3600,
-              currEnd: (currTime + 0.5) * 3600,
-            });
-            invalidStart -= 1;
-            for (let j = 0; j < eventStart - (currTime + 0.5); j += 1) {
-              result.push({
-                start: invalidStart,
-                currStart: (currTime + 0.5 + j) * 3600,
-                currEnd: (currTime + 0.5 + j + 1) * 3600,
-              });
-              invalidStart -= 1;
-            }
-          }
-        }
-
-        // Make a block for the current event
-        // if the section is a user locked section, pass it in as a locked event
-        if (event.code.includes('Lock')) {
-          result.push({
-            start: invalidStart,
-            currStart: event.start,
-            currEnd: event.start + 3600,
-          });
-          invalidStart -= 1;
-        } else {
-          event.currStart = event.start;
-          if (Number.isInteger(currTime)){
-            if (timeToEvents[[event.currStart]]){
-              timeToEvents[[event.currStart]].push(event)
-            }else {
-              timeToEvents[[event.currStart]] = [event]
-              result.push(event);
-            }
-          }else {
-            // Half an hour edge case
-            // const offset = (event.end / 3600 + 0.5) * 3600
-            // eslint-disable-next-line no-lonely-if
-            if (timeToEvents[[event.currStart]]){
-              timeToEvents[[event.currStart]].push(event)
-            }else {
-              timeToEvents[[event.currStart]] = [event]
-              result.push(event);
-            }
-          }
-          
-        }
-
-        currTime = eventEnd;
-
-        // If last event, pad empty events after it
-        if (
-          i === meetingSections.length - 1 ||
-          convertSecondsToHours(meetingSections[i + 1].start) >=
-            this.timetableEnd
-        ) {
-          // half hour
-          if (!Number.isInteger(currTime)) {
-            result.push({
-              start: invalidStart,
-              currStart: currTime * 3600,
-              currEnd: (currTime + 0.5) * 3600,
-            });
-            invalidStart -= 1;
-            currTime += 0.5;
-          }
-          for (let k = 0; k < this.timetableEnd - currTime; k += 1) {
-            result.push({
-              start: invalidStart,
-              currStart: (currTime + k) * 3600,
-              currEnd: (currTime + k + 1) * 3600,
-            });
-            invalidStart -= 1;
-          }
-        }
-      }
-      // Result is sorted by currStart already.
-
-            // Sort every event by start time
-      // result.push({start: 37800, currStart: 37800, end: 46800});
-      result.sort((a, b) => a.currStart - b.currStart);
+     
+      const meetingResults = meetingSections.map(m => {
+        m.currStart = m.start;
+        m.currEnd = m.end;
+        return m;
+      })
+      // Sort every event by start time
+      meetingResults.sort((a, b) => a.currStart - b.currStart);
       // Need to find the biggest overlapping section. 
       const sortedTimeEvents = [];
       // current start and end times. 
-      let end;
+      let start, end;
+      const HOUR_OFFSET = 3600;
 
-      for(let i = 0; i < result.length; i+=1){
-        // if the start time is < 0, it's empty block. 
-        if (result[i].start < 0) {
-          sortedTimeEvents.push(result[i]);
-        }
-        // If start time > 0, it's an actual course and we need to find max overlap. 
-        else {
-          end = result[i].end;
-          // Contains all courses overlapping from a given range (s, e)
-          const overlappingCourses = [result[i]];
-          // Loop through next course onwards to find max overlap.
-          let j;
-          for (j=i+1; j < result.length; j+=1) {
-            // This course is not overlapping anymore, so get the out of this loop
-            if (result[j].currStart >= end){
-              break;
-            }
-            // The course is overlapping. 
-            // Update the end value to be the greater of current end or new end
-            end = result[j].end > end ? result[j].end : end;
-            // Add this new overlapping course. 
-            overlappingCourses.push(result[j]);
-          }
-          // Update all of the courses' ends (overlap period's end) and currEnd (each courses' end)
-          for (let k = 0; k < overlappingCourses.length; k+=1) {
-            overlappingCourses[k].olap_end = end;
-            overlappingCourses[k].olap_start = result[i].start;
-          }
-
-          // Push the new result. 
-          sortedTimeEvents.push({
-          currStart: result[i].currStart,
-          currEnd: end,
-          start: result[i].start,
-          courses: overlappingCourses
+      for(let i = 0; i < meetingResults.length; i+=1){
+        if (meetingResults[i].code.includes('Lock')) {
+          result.push({
+            start: invalidStart,
+            currStart: meetingResults[i].start,
+            currEnd: meetingResults[i].start + HOUR_OFFSET,
           });
-          // Update the i value, since we already looked at the next courses. 
-          i = j-1;
+          invalidStart -= 1;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+        start = meetingResults[i].start;
+        end = meetingResults[i].end;
+        // Contains all courses overlapping from a given range (s, e)
+        const overlappingCourses = [meetingResults[i]];
+        // Loop through next course onwards to find max overlap.
+        let j;
+        for (j=i+1; j < meetingResults.length; j+=1) {
+          // This course is not overlapping anymore, so get the out of this loop
+          if (meetingResults[j].currStart >= end || meetingResults[j].end <= start){
+            break;
+          }
+          // The course is overlapping. 
+          // Update the end value to be the greater of current end or new end
+          end = meetingResults[j].end > end ? meetingResults[j].end : end;
+          start = meetingResults[j].currStart < start ? meetingResults[j].currStart : start;
+          // Add this new overlapping course. 
+          overlappingCourses.push({...meetingResults[j]});
+        }
+        // Update all of the courses' ends (overlap period's end) and currEnd (each courses' end)
+        for (let k = 0; k < overlappingCourses.length; k+=1) {
+          overlappingCourses[k].olap_end = end;
+          overlappingCourses[k].olap_start = start;
+        }
+
+        // Push the new result. 
+        sortedTimeEvents.push({
+        currStart: start,
+        currEnd: end,
+        start,
+        courses: overlappingCourses
+        });
+        // Update the i value, since we already looked at the next courses. 
+        i = j-1;
+      }
+      // Add padding to sortedtimeEvents depending on currStart and currEnd 
+      const finalResult = [];
+      let sortedIndex = 0;
+      currTime *= HOUR_OFFSET;
+      // Loop through the entire time zones
+      while (currTime < this.timetableEnd * HOUR_OFFSET) {
+        if (sortedIndex < sortedTimeEvents.length && currTime === sortedTimeEvents[sortedIndex].currStart) {
+          // Add event 
+          finalResult.push(sortedTimeEvents[sortedIndex]);
+          // Move currTime to end of this overlap section 
+          currTime = sortedTimeEvents[sortedIndex].currEnd;
+          sortedIndex+=1;
+        }
+        // If currTime is half an hour, extend it to full hour 
+        else if (currTime - (HOUR_OFFSET/2) % HOUR_OFFSET === 0){
+          finalResult.push({
+              start: -invalidStart,
+              currStart: currTime,
+              currEnd: currTime + HOUR_OFFSET / 2,
+            });
+            invalidStart -= 1;
+            currTime += HOUR_OFFSET / 2;
+        }
+        // Add hour padding
+        else {
+          finalResult.push({
+              start: invalidStart,
+              currStart: currTime,
+              currEnd: currTime + HOUR_OFFSET,
+            });
+            invalidStart -= 1;
+            currTime += HOUR_OFFSET;
         }
       }
-      return sortedTimeEvents;
+      return finalResult;
 
     },
   },

@@ -314,6 +314,7 @@ const generateTimetables = (
   }
   // solve it
   const csp = { variables: newUniqueCourses, constraints };
+  console.log(csp);
   const cspResult = cspSolve(csp);
 
   // Checks if it failed to create one
@@ -358,7 +359,6 @@ const generateTimetables = (
     fallTimetable[day].sort((a, b) => a.start - b.start);
     winterTimetable[day].sort((a, b) => a.start - b.start);
   }
-
   return [fallTimetable, winterTimetable];
 };
 export { generateTimetables };
