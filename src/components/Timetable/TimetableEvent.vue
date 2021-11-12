@@ -15,7 +15,7 @@
               height: getHeight
             }"
           >
-            <h4>{{ event.code }}</h4>
+            <h4 class="pb-2">{{ event.code }}</h4>
 
             <div class="lock-button">
               <v-btn small dark @click.stop="lockToggle" v-if="locked" icon>
