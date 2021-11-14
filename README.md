@@ -42,3 +42,11 @@ cd via-timetable
 npm install
 npm run serve
 ```
+
+## Testing
+
+Tests are found in `tests/`
+
+```sh
+yarn run test:unit
+```
