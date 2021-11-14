@@ -1,12 +1,15 @@
 <template>
-  <div :style="contentHeight">
-    <v-row class="fill-height" justify="center" align="center">
-      Program
-    </v-row>
-  </div>
+<v-row >
+      <program-card bgColor=orange />
+</v-row>
 </template>
 <script>
+import ProgramCard from '../components/Program/ProgramCard.vue';
+
 export default {
+  components: {
+    ProgramCard,
+  },
   computed: {
     contentHeight() {
       return `height: ${window.innerHeight - 110}px`;
