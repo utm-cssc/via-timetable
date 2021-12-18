@@ -1,7 +1,15 @@
 <template>
-<v-row >
+<v-list
+style="max-height: 1000px; padding: 100px; margin-top:15px"
+class="overflow-y-auto"
+>
       <program-card bgColor=orange />
-</v-row>
+       <program-card bgColor=orange />
+        <program-card bgColor=orange />
+         <program-card bgColor=orange />
+          <program-card bgColor=orange />
+               <program-card bgColor=orange />
+</v-list>
 </template>
 <script>
 import ProgramCard from '../components/Program/ProgramCard.vue';
