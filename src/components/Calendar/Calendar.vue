@@ -107,6 +107,12 @@
                 <v-toolbar :color="getSelectedEvent.color" dark>
                   <v-toolbar-title v-html="getSelectedEvent.name"></v-toolbar-title>
                   <v-spacer></v-spacer>
+                  <notification-menu 
+                    :assessmentName="getSelectedEvent.name"
+                    :assessmentDate="getSelectedEvent.start"
+                    :assessmentDetails="getSelectedEvent.details"
+                    :assessmentCategory="getSelectedEvent.category"
+                  />
                   <v-btn class="mr-1" icon @click="deleteEvent(getSelectedEvent)">
                     <v-icon>mdi-trash-can-outline</v-icon>
                   </v-btn>
@@ -136,10 +142,12 @@
 
 import { mapGetters, mapMutations } from 'vuex';
 import AddAssessmentMenu from './AddAssessmentMenu.vue';
+import NotificationMenu from './NotificationMenu.vue';
 
 export default {
   components: {
     AddAssessmentMenu,
+    NotificationMenu,
   },
   created() {
     window.addEventListener('resize', this.handleResize);
