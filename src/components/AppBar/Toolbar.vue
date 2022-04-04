@@ -9,12 +9,13 @@
       />
       <v-tabs
           grow
-          style="max-width: 450px; min-width: 200px"
+          style="max-width: 650px; min-width: 200px"
           v-model="tabs"
         >
         <v-tab>TIMETABLE</v-tab>
         <v-tab>MANAGER</v-tab>  
         <v-tab>CALENDAR</v-tab>  
+        <v-tab>HEATMAP</v-tab>
       </v-tabs>
       <course-search-bar style="margin: auto" />
       <switch-sem style="margin: auto" />

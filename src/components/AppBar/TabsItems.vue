@@ -27,6 +27,13 @@
         </v-col>
       </v-row>
     </v-tab-item>
+    <v-tab-item>
+      <v-row>
+        <v-col class="pa-0">
+          <heat-map />
+        </v-col>
+      </v-row>
+    </v-tab-item>
   </v-tabs-items>
 </template>
 
@@ -34,13 +41,15 @@
 
 import Calendar from '../Calendar/Calendar.vue';
 import SideBar from '../SidePanel/SideBar.vue';
-import Manager from '../CourseManager/Manager.vue'
+import Manager from '../CourseManager/Manager.vue';
+import HeatMap from '../HeatMap/HeatMap.vue';
 
 export default {
   components: {
     Calendar,
     SideBar,
     Manager,
+    HeatMap,
   },
   props: {
     value: Number
