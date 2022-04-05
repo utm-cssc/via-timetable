@@ -111,7 +111,7 @@
                     :assessmentName="getSelectedEvent.name"
                     :assessmentDate="getSelectedEvent.start"
                     :assessmentDetails="getSelectedEvent.details"
-                    :assessmentCategory="getSelectedEvent.category"
+                    :assessmentCourse="getSelectedEvent.category"
                   />
                   <v-btn class="mr-1" icon @click="deleteEvent(getSelectedEvent)">
                     <v-icon>mdi-trash-can-outline</v-icon>

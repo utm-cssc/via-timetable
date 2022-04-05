@@ -77,7 +77,7 @@ export default {
     assessmentName: String,
     assessmentDate: Number,
     assessmentDetails: String,
-    assessmentCategory: String,
+    assessmentCourse: String,
   },
   methods: {
     async createNotification() {
@@ -88,7 +88,7 @@ export default {
           assessmentName: this.assessmentName,
           assessmentDate: this.assessmentDate,
           assessmentDetails: this.assessmentDetails,
-          assessmentCategory: this.assessmentCategory,
+          assessmentCourse: this.assessmentCourse,
         })
       } catch (e) {
         // eslint-disable-next-line
